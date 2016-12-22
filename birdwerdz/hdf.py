@@ -72,8 +72,7 @@ def classify(recordings, template, output_name,
                 out.copy(src[template], 'template')
                 template=out['template']
                 if 'sampling_rate' not in out['template'].attrs.iterkeys():
-                    out['template'].attrs['sampling_rate'] = 20000
-                print(out['template'].attrs['sampling_rate'])
+                    raise ValueError('Template dataset %s does not have a sampling rate attribute'%template.name)
                 fs_temp=out['template'].attrs['sampling_rate']
         except Exception as e:
             print("Could not open template recording")
