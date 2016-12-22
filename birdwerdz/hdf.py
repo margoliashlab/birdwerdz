@@ -73,18 +73,26 @@ def classify(recordings, template, output_name,
                 template=out['template']
                 if 'sampling_rate' not in out['template'].attrs.iterkeys():
                     out['template'].attrs['sampling_rate'] = 20000
+                print(out['template'].attrs['sampling_rate'])
                 fs_temp=out['template'].attrs['sampling_rate']
         except Exception as e:
             print("Could not open template recording")
             raise e
 
+        for idx,entry in enumerate(out.itervalues()):
+            if not isinstance(entry, h5py.Group): continue
+            vocalization = entry.values()[0]
+            if vocalization.attrs.get('sampling_rate') is None:
+                raise ValueError('Vocalization dataset %s does not have a sampling rate attribute'%vocalization.name)
+        
         #finding matches
         for idx,entry in enumerate(out.itervalues()):
             if not isinstance(entry, h5py.Group): continue
         
             vocalization = entry.values()[0]
-            fs_voc = vocalization.attrs['sampling_rate']                
 
+            fs_voc = vocalization.attrs['sampling_rate']                
+            
             sampled_data, spectrogram, dtw_paths,_ = dtw.find_matches(
                     vocalization, template, fs_voc, fs_temp, all_spectrograms=False)
 
